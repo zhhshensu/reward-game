@@ -11,7 +11,9 @@ const Home: NextPage = (props) => {
   const [loading, setLoading] = useState(false)
   const [selection, setSelection] = useState<any[]>([])
   const ref = useRef<Price | null>()
-  let initData = ['凌大', '唐二', '张三', '李四', '王五', '朱六', '卓七']
+  const initData = useMemo(() => {
+    return ['凌大', '唐二', '张三', '李四', '王五', '朱六', '卓七']
+  }, [])
   const [cards, setCards] = useState(initData)
   useEffect(() => {
     if (!ref.current) {
@@ -23,7 +25,7 @@ const Home: NextPage = (props) => {
     return () => {
       ref.current = null
     }
-  }, [])
+  }, [initData])
   const run = () => {
     if (ref.current) {
       if (loading) return
@@ -44,21 +46,24 @@ const Home: NextPage = (props) => {
       setCards(names)
     }
   }
-  const flipCard = (i) => {
+  const flipCard = (i: number) => {
     return new Promise((resolve, revoke) => {
-      gsap.to(document.getElementById('cards').children[i], {
-        duration: 1,
-        rotationY: '+=180',
-        ease: 'circ.out',
-        onComplete: () => {
-          // Resolve
-          resolve()
-        },
-      })
+      const cards = document.getElementById('cards')
+      if (cards) {
+        gsap.to(cards.children[i], {
+          duration: 1,
+          rotationY: '+=180',
+          ease: 'circ.out',
+          onComplete: () => {
+            // Resolve
+            resolve(null)
+          },
+        })
+      }
     })
   }
 
-  const playSound = (name) => {
+  const playSound = (name: string) => {
     // Initialize song
     let sound = new Howl({
       src: [`https://assets.codepen.io/141041/${name}.mp3`],
